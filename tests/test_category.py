@@ -4,34 +4,29 @@ from src.category import Category
 from src.product import Product
 
 
-def test_add_product():
-    category = Category("Ноутбуки", "Игровые ноутбуки")
-    product = Product("ASUS TUF", "RTX 4060, i7", 120000, 5)
-
-    category.add_product(product)
-
-    # Проверка количества продуктов через геттер
-    assert "ASUS TUF, 120000 руб. Остаток: 5 шт." in category.products
+def test_category_str():
+    p1 = Product("A", "desc", 100, 5)
+    p2 = Product("B", "desc", 200, 3)
+    c = Category("Смартфоны", "Описание", [p1, p2])
+    assert str(c) == "Смартфоны, количество продуктов: 8 шт."
 
 
-def test_products_property_output():
-    category = Category("Телевизоры", "Большие экраны")
-    product1 = Product('Samsung 55"', "Smart TV", 70000, 2)
-    product2 = Product('LG 65"', "OLED", 110000, 1)
-
-    category.add_product(product1)
-    category.add_product(product2)
-
-    output = category.products
-    assert 'Samsung 55", 70000 руб. Остаток: 2 шт.' in output
-    assert 'LG 65", 110000 руб. Остаток: 1 шт.' in output
+def test_category_add_product_valid():
+    c = Category("Техника", "Описание")
+    p = Product("Монитор", "desc", 15000, 4)
+    c.add_product(p)
+    assert str(p) in c.products
 
 
-def test_private_product_list_access():
-    category = Category("Смартфоны", "Флагманы")
-    # Проверка, что _products (приватный атрибут) не является публичным
-    with pytest.raises(AttributeError):
-        _ = category.products_list  # должен отсутствовать
+def test_category_add_product_invalid():
+    c = Category("Гаджеты", "Описание")
+    with pytest.raises(TypeError):
+        c.add_product("not a product")
 
-    # Но при этом products должен работать
-    assert isinstance(category.products, str)
+
+def test_category_products_str():
+    p1 = Product("A", "desc", 100, 1)
+    p2 = Product("B", "desc", 200, 1)
+    c = Category("Phones", "desc", [p1, p2])
+    lines = c.products.split("\n")
+    assert lines == [str(p1), str(p2)]
