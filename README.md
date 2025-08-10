@@ -1,90 +1,54 @@
-# Магазин товаров (Python)
+Описание проекта: Магазин товаров
+Основные классы
+1. Базовый класс
+Product - базовый класс для всех товаров
 
-Проект представляет собой систему управления товарами для магазина с использованием ООП.
+name: название товара
 
-## Функциональность
+description: описание
 
-### 1. Классы-наследники
-Реализованы два класса-наследника `Product`:
-- **`Smartphone`** (Смартфон):
-  - `efficiency` (производительность)
-  - `model` (модель)
-  - `memory` (объем памяти)
-  - `color` (цвет)
-  
-- **`LawnGrass`** (Трава газонная):
-  - `country` (страна-производитель)
-  - `germination_period` (срок прорастания)
-  - `color` (цвет)
+price: цена
 
-### 2. Ограничения сложения
-- Реализована проверка типов при сложении товаров:
-  ```python
-  smartphone1 + smartphone2  # OK
-  lawn_grass + smartphone    # TypeError!
-Используется type() для проверки совместимости типов
+quantity: количество на складе
 
-3. Ограничения добавления продукта
-Защита от добавления некорректных объектов в категории:
+2. Классы-наследники
+Smartphone (наследуется от Product)
 
-python
-category.add_product(smartphone)  # OK
-category.add_product("not a product")  # ValueError!
-Проверка через isinstance() и issubclass()
+Дополнительные параметры:
 
-4. Тестирование
-Написаны тесты для новой функциональности
+efficiency: производительность процессора
 
-Покрытие кода тестами >75%
+model: модель телефона
 
-Отчет о покрытии в coverage.xml/htmlcov/
+memory: объем памяти
 
-Установка и запуск
-Клонировать репозиторий:
+color: цвет
 
-bash
-git clone https://github.com/yourusername/shop-project.git
-cd shop-project
-Установить зависимости:
+LawnGrass (наследуется от Product)
 
-bash
-pip install -r requirements.txt
-Запустить тесты:
+Дополнительные параметры:
 
-bash
-pytest --cov=.
-Пример использования
-python
-from products import Product, Smartphone, LawnGrass
-from category import Category
+country: страна-производитель
 
-# Создание продуктов
-iphone = Smartphone("iPhone 15", "Flagship smartphone", 999.99, 10,
-                   efficiency="A16 Bionic", model="15 Pro",
-                   memory=256, color="Space Gray")
+germination_period: срок прорастания (в днях)
 
-grass = LawnGrass("Premium Grass", "Green lawn", 49.99, 100,
-                 country="Netherlands",
-                 germination_period=14, color="Emerald")
+color: цвет травы
 
-# Работа с категорией
-electronics = Category("Electronics", "Tech products")
-electronics.add_product(iphone)  # Успешно
-electronics.add_product(grass)   # ValueError!
-Структура проекта
-text
-shop/
-├── __init__.py
-├── products.py       # Базовый класс и наследники
-├── category.py      # Логика работы с категориями
-├── tests/
-│   ├── test_products.py
-│   └── test_category.py
-├── main.py          # Пример использования
-└── requirements.txt
-Требования
-Python 3.8+
+Особенности реализации
+Сложение товаров:
 
-pytest (для тестирования)
+Можно складывать только товары одного типа
 
-coverage (для отчетов)
+При попытке сложить разные типы (например, смартфон и траву) - вызовется ошибка TypeError
+
+Добавление товаров:
+
+В категории можно добавлять только объекты класса Product или его наследников
+
+При попытке добавить другой объект - вызовется ошибка
+
+Тестирование:
+
+Все новые функции покрыты тестами
+
+Общее покрытие кода тестами более 75%
