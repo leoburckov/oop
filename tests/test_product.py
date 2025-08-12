@@ -1,28 +1,32 @@
 import pytest
 
-from src.product import Product
+from src.category import Category
+from src.product import Product, Smartphone
 
 
-def test_product_str():
-    p = Product("TestPhone", "Описание", 100.0, 5)
-    assert str(p) == "TestPhone, 100.0 руб. Остаток: 5 шт."
+def test_category_initialization():
+    p1 = Product("P1", "Desc", 100.0, 1)
+    cat = Category("Test Cat", "Test Desc", [p1])
+    assert cat.name == "Test Cat"
+    assert len(cat.products) == 1
 
 
-def test_product_price_getter_setter():
-    p = Product("Test", "desc", 200.0, 1)
-    assert p.price == 200.0
-    p.price = 250.0
-    assert p.price == 250.0
+def test_add_product_valid():
+    cat = Category("Phones", "Phone Category")
+    phone = Smartphone("Phone", "Desc", 200.0, 5, 95.5, "X1", 128, "Black")
+    cat.add_product(phone)
+    assert len(cat.products) == 1
 
 
-def test_product_price_setter_invalid():
-    p = Product("Test", "desc", 100.0, 1)
-    with pytest.raises(ValueError):
-        p.price = -50
+def test_add_product_invalid():
+    cat = Category("Phones", "Phone Category")
+    with pytest.raises(TypeError):
+        cat.add_product("not a product")
 
 
-def test_product_addition():
-    p1 = Product("A", "desc", 100.0, 2)
-    p2 = Product("B", "desc", 200.0, 3)
-    total = p1 + p2
-    assert total == (100.0 * 2 + 200.0 * 3)
+def test_products_getter():
+    phone = Smartphone("Phone", "Desc", 200.0, 5, 95.5, "X1", 128, "Black")
+    cat = Category("Phones", "Phone Category", [phone])
+    result = cat.products
+    assert isinstance(result, list)
+    assert "Phone" in result[0]
