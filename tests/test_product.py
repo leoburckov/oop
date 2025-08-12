@@ -1,32 +1,56 @@
 import pytest
 
-from src.category import Category
-from src.product import Product, Smartphone
+from src.product import LawnGrass, Product, Smartphone
 
 
-def test_category_initialization():
-    p1 = Product("P1", "Desc", 100.0, 1)
-    cat = Category("Test Cat", "Test Desc", [p1])
-    assert cat.name == "Test Cat"
-    assert len(cat.products) == 1
+def test_product_init():
+    p = Product("Test", "Description", 100.0, 5)
+    assert p.name == "Test"
+    assert p.price == 100.0
+    assert p.quantity == 5
 
 
-def test_add_product_valid():
-    cat = Category("Phones", "Phone Category")
-    phone = Smartphone("Phone", "Desc", 200.0, 5, 95.5, "X1", 128, "Black")
-    cat.add_product(phone)
-    assert len(cat.products) == 1
+def test_price_setter_valid():
+    p = Product("Test", "Description", 100.0, 5)
+    p.price = 200.0
+    assert p.price == 200.0
 
 
-def test_add_product_invalid():
-    cat = Category("Phones", "Phone Category")
+def test_price_setter_invalid(capsys):
+    p = Product("Test", "Description", 100.0, 5)
+    p.price = 0
+    captured = capsys.readouterr()
+    assert "Цена не должна быть" in captured.out
+    assert p.price == 100.0
+
+
+def test_add_same_type():
+    p1 = Product("Test", "Description", 100.0, 5)
+    p2 = Product("Test", "Description", 100.0, 3)
+    assert p1 + p2 == 8
+
+
+def test_add_different_type():
+    p1 = Product("Test", "Description", 100.0, 5)
+    p2 = Smartphone("Phone", "Desc", 1000, 2, 95.5, "Model", 128, "Black")
     with pytest.raises(TypeError):
-        cat.add_product("not a product")
+        _ = p1 + p2
 
 
-def test_products_getter():
-    phone = Smartphone("Phone", "Desc", 200.0, 5, 95.5, "X1", 128, "Black")
-    cat = Category("Phones", "Phone Category", [phone])
-    result = cat.products
-    assert isinstance(result, list)
-    assert "Phone" in result[0]
+def test_new_product():
+    data = {"name": "Test", "description": "Desc", "price": 100.0, "quantity": 5}
+    p = Product.new_product(data)
+    assert isinstance(p, Product)
+    assert p.name == "Test"
+
+
+def test_smartphone_init():
+    s = Smartphone("Phone", "Desc", 1000, 2, 95.5, "Model", 128, "Black")
+    assert s.memory == 128
+    assert s.color == "Black"
+
+
+def test_lawngrass_init():
+    g = LawnGrass("Grass", "Desc", 500, 10, "Россия", "7 дней", "Зеленый")
+    assert g.country == "Россия"
+    assert g.color == "Зеленый"
