@@ -4,31 +4,38 @@ from src.category import Category
 from src.product import Product
 
 
-@pytest.fixture
-def sample_products():
-    return [Product("Test1", "Desc", 100.0, 5), Product("Test2", "Desc", 200.0, 3)]
+def test_category_init_and_products():
+    p1 = Product("Test1", "Desc", 100.0, 5)
+    p2 = Product("Test2", "Desc", 200.0, 10)
+    category = Category("TestCat", "Category for tests", [p1, p2])
+
+    assert category.name == "TestCat"
+    assert "Test1" in category.products
+    assert "Test2" in category.products
 
 
-def test_category_init(sample_products):
-    c = Category("TestCat", "Description", sample_products)
-    assert c.name == "TestCat"
-    assert len(c.products) == 2
+def test_add_product_valid():
+    p = Product("Test", "Desc", 100.0, 5)
+    category = Category("TestCat", "Category for tests")
+    category.add_product(p)
+
+    assert "Test" in category.products
 
 
-def test_add_product(sample_products):
-    c = Category("TestCat", "Description", [])
-    c.add_product(sample_products[0])
-    assert len(c.products) == 1
-
-
-def test_add_invalid_product():
-    c = Category("TestCat", "Description", [])
+def test_add_product_invalid():
+    category = Category("TestCat", "Category for tests")
     with pytest.raises(TypeError):
-        c.add_product("Not a product")
+        category.add_product("not a product")
 
 
-def test_products_repr(sample_products):
-    c = Category("TestCat", "Description", sample_products)
-    for item in c.products:
-        assert isinstance(item, str)
-        assert "руб." in item
+def test_average_price():
+    p1 = Product("Test1", "Desc", 100.0, 5)
+    p2 = Product("Test2", "Desc", 200.0, 10)
+    category = Category("TestCat", "Category for tests", [p1, p2])
+
+    assert category.average_price() == 150.0
+
+
+def test_average_price_empty():
+    category = Category("Empty", "No products", [])
+    assert category.average_price() == 0.0

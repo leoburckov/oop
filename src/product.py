@@ -1,83 +1,71 @@
 from __future__ import annotations
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Dict, Any, cast
 
 
 class BaseProduct(ABC):
-    """Абстрактный базовый класс для всех продуктов"""
+    """Абстрактный базовый класс для всех продуктов."""
 
     @abstractmethod
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.price = price
+        self._price = price
         self.quantity = quantity
-
-    @abstractmethod
-    def __add__(self, other: Any) -> float:
-        """Складывает количество продуктов"""
-        pass
-
-
-class InfoMixin:
-    """Миксин для вывода информации при создании объекта"""
-
-    def __init__(self, *args, **kwargs) -> None:
-        print(f"Создан объект {self.__class__.__name__} с параметрами: {args} {kwargs}")
-        super().__init__(*args, **kwargs)
-
-
-class Product(InfoMixin, BaseProduct):
-    """Основной класс продукта"""
-
-    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
-        super().__init__(name, description, price, quantity)
-        self.__price = price
-        Product.product_count += 1
-
-    product_count = 0
 
     @property
     def price(self) -> float:
-        return self.__price
+        return self._price
 
     @price.setter
     def price(self, value: float) -> None:
         if value <= 0:
             print("Цена не должна быть нулевая или отрицательная")
             return
-        self.__price = value
+        self._price = value
+
+
+class InfoMixin:
+    """Миксин для вывода информации о создании объекта."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        class_name = self.__class__.__name__
+        print(f"{class_name} создан с параметрами: {args}, {kwargs}")
+        super().__init__(*args, **kwargs)
+
+
+class Product(InfoMixin, BaseProduct):
+    """Базовый класс для всех товаров."""
+
+    def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
+        super().__init__(name, description, price, quantity)
 
     @classmethod
-    def new_product(
-        cls,
-        name: str,
-        description: str,
-        price: float,
-        quantity: int
-    ) -> Product:
-        return cls(name, description, price, quantity)
+    def new_product(cls, data: Dict[str, Any]) -> Product:
+        """Создает продукт из словаря с безопасным приведением типов."""
+        return cls(
+            cast(str, data.get("name")),
+            cast(str, data.get("description")),
+            float(cast(Any, data.get("price"))),
+            int(cast(Any, data.get("quantity"))),
+        )
 
-    def __add__(self, other: Any) -> float:
+    def __add__(self, other: object) -> int:
         if type(self) is not type(other):
-            raise TypeError("Складывать можно только одинаковые типы продуктов")
-        return self.quantity + other.quantity
+            raise TypeError("Можно складывать только продукты одного класса")
+        return self.quantity + other.quantity  # type: ignore
+
+    def __str__(self) -> str:
+        return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."
 
 
 class Smartphone(Product):
-    """Класс для смартфонов"""
+    """Класс для смартфонов."""
 
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        price: float,
-        quantity: int,
-        efficiency: float,
-        model: str,
-        memory: int,
-        color: str
-    ) -> None:
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 efficiency: float, model: str, memory: int, color: str) -> None:
         super().__init__(name, description, price, quantity)
         self.efficiency = efficiency
         self.model = model
@@ -86,18 +74,10 @@ class Smartphone(Product):
 
 
 class LawnGrass(Product):
-    """Класс для газонной травы"""
+    """Класс для газонной травы."""
 
-    def __init__(
-        self,
-        name: str,
-        description: str,
-        price: float,
-        quantity: int,
-        country: str,
-        germination_period: str,
-        color: str
-    ) -> None:
+    def __init__(self, name: str, description: str, price: float, quantity: int,
+                 country: str, germination_period: str, color: str) -> None:
         super().__init__(name, description, price, quantity)
         self.country = country
         self.germination_period = germination_period
